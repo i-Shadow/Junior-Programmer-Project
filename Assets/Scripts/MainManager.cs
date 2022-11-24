@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class MainManager : MonoBehaviour
     public Text ScoreText;
     public GameObject GameOverText;
     
+    [SerializeField] Text bestScoreText;
+
+
+
     private bool m_Started = false;
     private int m_Points;
     
@@ -22,8 +27,13 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GameManager.Instance.LoadScore();
+        ScoreText.text = $"Score: {GameManager.Instance.playerName}: 0";
+        bestScoreText.text = $"Best Score: {GameManager.Instance.bestPlayer}: {GameManager.Instance.bestScore}";
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
+
         
         int[] pointCountArray = new [] {1,1,2,2,5,5};
         for (int i = 0; i < LineCount; ++i)
@@ -65,11 +75,16 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = $"Score: {GameManager.Instance.playerName}: {m_Points}";
     }
 
     public void GameOver()
     {
+        
+        if (m_Points > GameManager.Instance.bestScore)
+        {
+            GameManager.Instance.SaveScore(GameManager.Instance.playerName, m_Points);
+        }
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
